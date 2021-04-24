@@ -12,7 +12,7 @@ from statsmodels.tsa.arima_model import ARIMA
 from datetime import datetime
 
 
-def test_stationarity(timeseires):
+def test_stationarity(timeseires, needPrediction):
 
     # determing rolling statistics
     movingAverage = timeseires.rolling(window=12).mean()
@@ -28,7 +28,7 @@ def test_stationarity(timeseires):
 
     # perform dickey-fluller test:
     print("Result of Dickey-Fuller Test:")
-    dftest = adfuller(timeseires['Sales'], autolag='AIC')
+    dftest = adfuller(timeseires[needPrediction], autolag='AIC')
     dfoutput = pd.Series(dftest[0:4], index=['Test statics', 'p-values', '#Lags Used', ' Number of Observations used'])
 
     for key,value in dftest[4].items():
@@ -38,8 +38,9 @@ def test_stationarity(timeseires):
 
 
 
-def getPredict(months = 1):
-    url = "https://cakery-ai-s3.s3-ap-southeast-1.amazonaws.com/CakeMonthlySaleReport.csv"
+def getPredict(fileURL,needPrediction,months = 1):
+    # url = "https://cakery-ai-s3.s3-ap-southeast-1.amazonaws.com/CakeMonthlySaleReport.csv"
+    url = fileURL
     dataset = pd.read_csv(url)
 
     # dataset = pd.read_csv('d:/SLIIT/3rd yr - UOB/2nd Sem/Research 2nd sem/py/CakeMonthlySaleReport.csv')
@@ -72,7 +73,7 @@ def getPredict(months = 1):
 
 
     print('Result of Dickey-fuller test:')
-    dftest = adfuller(indexedDataset['Sales'], autolag='AIC')
+    dftest = adfuller(indexedDataset[needPrediction], autolag='AIC')
 
     dfoutput = pd.Series(dftest[0:4], index=['Test statics', 'p-values', '#Lags Used', ' Number of Observations used'])
 
@@ -101,20 +102,20 @@ def getPredict(months = 1):
 
 
 
-    # test_stationarity(datasetLogScaleMinusMovingAverage)
+    # test_stationarity(datasetLogScaleMinusMovingAverage,needPrediction)
 
     exponentialDecayWeightAvg = indexedDataset_logScale.ewm(halflife=12, min_periods=0, adjust=True).mean()
     # plt.plot(indexedDataset_logScale)
     # plt.plot(exponentialDecayWeightAvg, color="red")
 
     datasetLogScaleMinusMovingExponentialDecayAvg = indexedDataset_logScale - exponentialDecayWeightAvg
-    # test_stationarity(datasetLogScaleMinusMovingExponentialDecayAvg)
+    # test_stationarity(datasetLogScaleMinusMovingExponentialDecayAvg, needPrediction)
 
     datasetLogDiffShifting = indexedDataset_logScale - indexedDataset_logScale.shift()
     # plt.plot(datasetLogDiffShifting)
 
     datasetLogDiffShifting.dropna(inplace=True)
-    # test_stationarity(datasetLogDiffShifting)
+    # test_stationarity(datasetLogDiffShifting, needPrediction)
 
 
     decomposition = seasonal_decompose(indexedDataset_logScale)
@@ -140,11 +141,11 @@ def getPredict(months = 1):
     decomposedLogdata = residual
     decomposedLogdata.dropna(inplace=True)
 
-    # test_stationarity(decomposedLogdata)
+    # test_stationarity(decomposedLogdata, needPrediction)
 
     decomposedLogdata = residual
     decomposedLogdata.dropna(inplace=True)
-    # test_stationarity(decomposedLogdata)
+    # test_stationarity(decomposedLogdata, needPrediction)
 
     # ACf & PACF plots:
 
@@ -176,7 +177,7 @@ def getPredict(months = 1):
     results_AR = model.fit(disp=-1)
     # plt.plot(datasetLogDiffShifting)
     # plt.plot(results_AR.fittedvalues, color="red")
-    # plt.title("RSS: %.4f"% sum((results_AR.fittedvalues - datasetLogDiffShifting['Sales'])**2))
+    # plt.title("RSS: %.4f"% sum((results_AR.fittedvalues - datasetLogDiffShifting[needPrediction])**2))
     print('Plotting AR model')
 
     #MA model
@@ -184,14 +185,14 @@ def getPredict(months = 1):
     results_MA = model.fit(disp=-1)
     # plt.plot(datasetLogDiffShifting)
     # plt.plot(results_MA.fittedvalues, color='red')
-    # plt.title('RSS: %.4f'% sum((results_MA.fittedvalues - datasetLogDiffShifting['Sales'])**2))
+    # plt.title('RSS: %.4f'% sum((results_MA.fittedvalues - datasetLogDiffShifting[needPrediction])**2))
     print('Plotting MA model')
 
     model = ARIMA(indexedDataset_logScale, order=(2,1,2))
     results_ARIMA = model.fit(disp=-1)
     # plt.plot(datasetLogDiffShifting)
     # plt.plot(results_ARIMA.fittedvalues, color='red')
-    # plt.title('RSS: %.4f'% sum((results_ARIMA.fittedvalues - datasetLogDiffShifting['Sales'])**2))
+    # plt.title('RSS: %.4f'% sum((results_ARIMA.fittedvalues - datasetLogDiffShifting[needPrediction])**2))
 
     predictions_ARIMA_diff = pd.Series(results_ARIMA.fittedvalues, copy=True)
     print(predictions_ARIMA_diff)
@@ -200,7 +201,7 @@ def getPredict(months = 1):
     predictions_ARIMA_diff_cumsum = predictions_ARIMA_diff.cumsum()
     print(predictions_ARIMA_diff_cumsum)
 
-    predictions_ARIMA_log = pd.Series(indexedDataset_logScale['Sales'].iloc[0], index = indexedDataset_logScale.index)
+    predictions_ARIMA_log = pd.Series(indexedDataset_logScale[needPrediction].iloc[0], index = indexedDataset_logScale.index)
     predictions_ARIMA_log = predictions_ARIMA_log.add(predictions_ARIMA_diff_cumsum, fill_value=0)
     predictions_ARIMA_log
 
