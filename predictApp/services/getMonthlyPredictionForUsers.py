@@ -11,14 +11,6 @@ from statsmodels.tsa.stattools import acf,pacf
 from statsmodels.tsa.arima_model import ARIMA
 from datetime import datetime
 
-# to remove waring messages
-import warnings
-warnings.filterwarnings('ignore', 'statsmodels.tsa.arima_model.ARMA',
-                        FutureWarning)
-warnings.filterwarnings('ignore', 'statsmodels.tsa.arima_model.ARIMA',
-                        FutureWarning)
-                        
-
 
 def test_stationarity(timeseires, needPrediction):
 
@@ -46,12 +38,10 @@ def test_stationarity(timeseires, needPrediction):
 
 
 
-def getPredict(fileURL,needPrediction,months = 1):
+def getPredictMonthly(fileURL,dataset,needPrediction,months = 1):
     # url = "https://cakery-ai-s3.s3-ap-southeast-1.amazonaws.com/CakeMonthlySaleReport.csv"
-    url = fileURL
-    dataset = pd.read_csv(url)
-
-    dataset = dataset[['Month', needPrediction]]
+    # url = fileURL
+    # dataset = pd.read_csv(url)
 
     # dataset = pd.read_csv('d:/SLIIT/3rd yr - UOB/2nd Sem/Research 2nd sem/py/CakeMonthlySaleReport.csv')
     dataset['Month'] = pd.to_datetime(dataset['Month'], infer_datetime_format=True)
