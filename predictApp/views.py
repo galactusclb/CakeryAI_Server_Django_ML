@@ -12,11 +12,27 @@ def index(request):
 
 @api_view(['GET'])
 def trainPredict(request):
+    query_params = request.query_params
+    
     if request.method == 'GET':
         try:
-            res = modelTrainer.trainModel()
-            return Response(res)
-        except:
+
+            print(query_params)
+            fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
+            needPrediction = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
+
+            needPredictionList = json.loads(needPrediction)
+            print(needPredictionList)
+            # outputs = []
+
+            for item in needPredictionList:
+                print(item)
+                res = modelTrainer.trainModel(fileURL,item)
+                # outputs.append({ 'product': item, 'prediction': res})
+
+            return HttpResponse('your model is training')
+        except Exception as e: 
+            print(e)
             return Response({"Error": "something wrong"}, status=500)
 
 @api_view(['GET'])
@@ -25,6 +41,8 @@ def getPrediction(request):
         res = getPredict.getPredict()
         return Response(res)
 
+
+# free users
 @api_view(['GET'])
 def getPredictionEduraca(request):
     # print(request.query_params.get('q'))
