@@ -46,59 +46,76 @@ def getMonthlyPrediction(request):
     # print(request.query_params.get('q'))
     query_params = request.query_params
 
-    # print(query_params)
+    print(query_params)
 
     if request.method == 'GET':
         fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
-        needPrediction = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
+        needPredictionList = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
         months = int(query_params.get('monthsCount')) if query_params.get('monthsCount') else 1
+
+        needPrediction = json.loads(needPredictionList)
+
+        outputs = []
+
+        for item in needPrediction:
+            res = getPredict2.getPredict(fileURL,item,months)
+            res = res[0] 
+            outputs.append({ 'product': item, 'prediction': res})
+
+        print('final outpust : ',outputs)
+        return Response(outputs)
+
+    # if request.method == 'GET':
+    #     fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
+    #     needPrediction = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
+    #     months = int(query_params.get('monthsCount')) if query_params.get('monthsCount') else 1
     
 
-        try:
-            print("*****************************************************")
-            url = fileURL
-            dataset = pd.read_csv(url)
-        except:
-            print("*******************Dead*********************")
+    #     try:
+    #         print("*****************************************************")
+    #         url = fileURL
+    #         dataset = pd.read_csv(url)
+    #     except:
+    #         print("*******************Dead*********************")
 
     
-        if(dataset.empty):
-            print ('CSV file is empty')
-        else:
-            print ('CSV file is not empty')
-            r = str(needPrediction).replace("'",'')
-            data = json.loads(r)
+    #     if(dataset.empty):
+    #         print ('CSV file is empty')
+    #     else:
+    #         print ('CSV file is not empty')
+    #         r = str(needPrediction).replace("'",'')
+    #         data = json.loads(r)
 
-            for product in data:
-                print(product)
+    #         for product in data:
+    #             print(product)
                 
-                if product in dataset.columns:
-                    print('\n\n\n\n\n\n\n\n')
-                    print(product +' is exists in dataset')
-                    getMonthlyPredictionForUsers.getPredictMonthly(fileURL, dataset, product, months)
-                    # print(res)
-                else:
-                    print('\n\n\n\n\n\n\n\n')
-                    print(product +' is not exists in dataset')
-                    # res = getMonthlyPredictionForUsers.getPredict(fileURL,product,months)
-                    # print(res)
-                # res = getMonthlyPredictionForUsers.getPredict(fileURL,product,months)
-                # outputs.append(res)
-                # print(res)
+    #             if product in dataset.columns:
+    #                 print('\n\n\n\n\n\n\n\n')
+    #                 print(product +' is exists in dataset')
+    #                 getMonthlyPredictionForUsers.getPredictMonthly(fileURL, dataset, product, months)
+    #                 # print(res)
+    #             else:
+    #                 print('\n\n\n\n\n\n\n\n')
+    #                 print(product +' is not exists in dataset')
+    #                 # res = getMonthlyPredictionForUsers.getPredict(fileURL,product,months)
+    #                 # print(res)
+    #             # res = getMonthlyPredictionForUsers.getPredict(fileURL,product,months)
+    #             # outputs.append(res)
+    #             # print(res)
 
-        # r = str(needPrediction).replace("'",'')
-        # data = json.loads(r)
-        # data
+    #     # r = str(needPrediction).replace("'",'')
+    #     # data = json.loads(r)
+    #     # data
 
-        # for product in data:
-        #     print(product)
-        #     res = getMonthlyPredictionForUsers.getPredict(fileURL,product,months)
-        #     # outputs.append(res)
-        #     print(res)
+    #     # for product in data:
+    #     #     print(product)
+    #     #     res = getMonthlyPredictionForUsers.getPredict(fileURL,product,months)
+    #     #     # outputs.append(res)
+    #     #     print(res)
 
-        # print(outputs)
+    #     # print(outputs)
 
 
-        # res = getMonthlyPredictionForUsers.getPredict(fileURL,needPrediction,months)
-        # return Response(res)
-        return HttpResponse('Welcome to cakery.Ai predict app')
+    #     # res = getMonthlyPredictionForUsers.getPredict(fileURL,needPrediction,months)
+    #     # return Response(res)
+    return HttpResponse('Welcome to cakery.Ai predict app')
