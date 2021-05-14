@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponse,JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 import json
 import pandas as pd
+from six import print_
 from .services import modelTrainer
 from .services import getPredict,getPredict2,getMonthlyPredictionForUsers
 
@@ -20,26 +22,42 @@ def trainPredict(request):
             print(query_params)
             fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
             needPrediction = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
+            userId = query_params.get('userId') if query_params.get('userId') else ''
 
             needPredictionList = json.loads(needPrediction)
             print(needPredictionList)
-            # outputs = []
+
+            outputs = []
 
             for item in needPredictionList:
                 print(item)
-                res = modelTrainer.trainModel(fileURL,item)
-                # outputs.append({ 'product': item, 'prediction': res})
+                res = modelTrainer.trainModel(fileURL,item,userId)
+                outputs.append({ 'product': item, 'trainedModelURL': res})
 
-            return HttpResponse('your model is training')
+            print(outputs)
+            
+            return Response(outputs, status=status.HTTP_200_OK)
         except Exception as e: 
             print(e)
             return Response({"Error": "something wrong"}, status=500)
 
 @api_view(['GET'])
 def getPrediction(request):
+
+    query_params = request.query_params
+
     if request.method == 'GET':
-        res = getPredict.getPredict()
-        return Response(res)
+        try:
+            fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
+            modelURL = query_params.get('modelURL') if query_params.get('modelURL') else ''
+            needPrediction = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
+            months = int(query_params.get('monthsCount')) if query_params.get('monthsCount') else 1
+
+            res = getPredict.getPredict(fileURL,modelURL,needPrediction,months)
+            return Response(res)
+        except Exception as e: 
+            print(e)
+            return Response({"Error": "something wrong"}, status=500)
 
 
 # free users

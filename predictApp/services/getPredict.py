@@ -10,7 +10,7 @@ from keras.layers import Dense,LSTM
 import matplotlib.pyplot as plt
 import pickle
 
-def getPredict():
+def getPredict(reportURL, modelURL,needPrediction,months = 1):
     url = "https://cakery-ai-s3.s3-ap-southeast-1.amazonaws.com/CakeMonthlySaleReport.csv"
     df = pd.read_csv(url)
 

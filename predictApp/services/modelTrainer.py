@@ -9,13 +9,25 @@ from keras.models import Sequential
 from keras.layers import Dense,LSTM
 import matplotlib.pyplot as plt
 import pickle
+import os
 
-def trainModel(url, product):
+import time
+
+# get current time in milliseconds
+def current_milli_time():
+    return round(time.time() * 1000)
+  
+# print the current timestamp
+print(current_milli_time())
+
+def trainModel(url, product, userId):
 
   plt.style.use('fivethirtyeight')
 
   needPrediction = product
 
+  dir_path = os.path.dirname(os.path.realpath(__file__))
+  
   # url = "https://cakery-ai-s3.s3-ap-southeast-1.amazonaws.com/CakeMonthlySaleReport.csv"
 
   df = pd.read_csv(url)
@@ -80,16 +92,20 @@ def trainModel(url, product):
   # Compile the model
   model.compile(optimizer='adam', loss='mean_squared_error')
 
+
   # Train the model
   model.fit(x_train, y_train, batch_size=1, epochs=10)
 
-  model.save('keras.h5')
+  modelSavePath = os.path.join(dir_path,'pre_trained_models/keras_'+str(current_milli_time())+'.h5')
+  model.save(modelSavePath)
+
+  # val_loss, val_acc = model.evaluate(x_train, y_train)
+  # print(val_loss, val_acc)
 
   # load trained model
-  loadedModel = keras.models.load_model("keras.h5")
-
+  loadedModel = keras.models.load_model(modelSavePath)
+  loadedModel.summary()
   print('xxxxx')
-  print(loadedModel)
 
   # Create the testing data set
   # Create a new array containing scaled values from index x to x
@@ -138,5 +154,5 @@ def trainModel(url, product):
   # plt.show()
 
   #show the valid and predicted prices
-  # valid
-  return valid    
+  print(modelSavePath)
+  return modelSavePath    
