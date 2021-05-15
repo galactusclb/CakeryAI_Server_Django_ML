@@ -42,7 +42,7 @@ def trainPredict(request):
             return Response({"Error": "something wrong"}, status=500)
 
 @api_view(['GET'])
-def getPrediction(request):
+def getPrediction_pro(request):
 
     query_params = request.query_params
 
@@ -53,6 +53,12 @@ def getPrediction(request):
             needPrediction = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
             months = int(query_params.get('monthsCount')) if query_params.get('monthsCount') else 1
 
+            needPrediction = json.loads(needPrediction)
+            print('fileURL: ', fileURL)
+            print('modelURL: ', modelURL)
+            print('needPrediction: ', needPrediction)
+            print('months: ', months)
+
             res = getPredict.getPredict(fileURL,modelURL,needPrediction,months)
             return Response(res)
         except Exception as e: 
@@ -62,7 +68,7 @@ def getPrediction(request):
 
 # free users
 @api_view(['GET'])
-def getPredictionEduraca(request):
+def getPredictionFree(request):
     # print(request.query_params.get('q'))
     query_params = request.query_params
     print("*********\n\n\n\n\n\n\n\n\n\n\n\n\n*******************")

@@ -105,7 +105,6 @@ def trainModel(url, product, userId):
   # load trained model
   loadedModel = keras.models.load_model(modelSavePath)
   loadedModel.summary()
-  print('xxxxx')
 
   # Create the testing data set
   # Create a new array containing scaled values from index x to x
