@@ -1,0 +1,1 @@
+web: gunicorn cakeryAiTensorflow.wsgi --log-file -
