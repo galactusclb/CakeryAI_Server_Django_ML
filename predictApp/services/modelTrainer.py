@@ -12,6 +12,8 @@ import pickle
 import os
 
 import time
+# from django.contrib.staticfiles.storage import staticfiles_storage
+from django.conf import settings as django_settings
 
 # get current time in milliseconds
 def current_milli_time():
@@ -96,7 +98,9 @@ def trainModel(url, product, userId):
   # Train the model
   model.fit(x_train, y_train, batch_size=1, epochs=10)
 
-  modelSavePath = os.path.join(dir_path,'pre_trained_models/keras_'+str(current_milli_time())+'.h5')
+  # modelSavePath = os.path.join(dir_path,'pre_trained_models/keras_'+str(current_milli_time())+'.h5')
+  modelSavePath = os.path.join(django_settings.STATIC_ROOT, 'pre_trained_models/keras_'+str(current_milli_time())+'.h5')
+  print(modelSavePath)
   model.save(modelSavePath)
 
   # val_loss, val_acc = model.evaluate(x_train, y_train)

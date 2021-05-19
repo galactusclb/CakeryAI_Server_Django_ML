@@ -19,7 +19,7 @@ def getPredict(reportURL, modelURL,needPrediction,months = 1):
 
     # load trained model
     # model = keras.models.load_model("keras.h5")
-    model = keras.models.load_model(modelURL, compile=False)
+    model = keras.models.load_model(modelURL)
     # model.summary()
 
     scaler = MinMaxScaler(feature_range=(0,1))
