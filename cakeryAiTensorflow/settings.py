@@ -25,7 +25,7 @@ SECRET_KEY = 'sl8(4bx*v35)9gv0s$+1*-*y6a9xw&fcfh+=^6l8j-xid(4je4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [127.0.0.1]
+ALLOWED_HOSTS = ['127.0.0.1','cakry-ai-django-predict.herokuapp.com']
 
 
 # Application definition
