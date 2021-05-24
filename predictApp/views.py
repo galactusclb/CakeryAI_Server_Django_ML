@@ -60,10 +60,19 @@ def getPrediction_pro(request):
             print('months: ', months)
 
             res = getPredict.getPredict(fileURL,modelURL,needPrediction,months)
+            
+            print('gg : ', res)
             return Response(res)
+
+        except (FileNotFoundError,ImportError) as e:
+            obj = json.loads(str(e))
+            print(type(e))
+            print(obj["message"])
+            return Response(obj, status=status.HTTP_404_NOT_FOUND) 
+
         except Exception as e: 
             print(e)
-            return Response({"Error": "something wrong"}, status=500)
+            return Response({"Error": "something wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # free users

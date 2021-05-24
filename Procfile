@@ -1,1 +1,1 @@
-web: gunicorn cakeryAiTensorflow.wsgi --log-level=debug --log-file --timeout 120
+web: gunicorn cakeryAiTensorflow.wsgi --log-level=debug --log-file 
