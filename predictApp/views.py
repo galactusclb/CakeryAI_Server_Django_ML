@@ -64,6 +64,9 @@ def getPrediction_pro(request):
             print('gg : ', res)
             return Response(res)
 
+        except FileNotFoundError as e:
+            return Response({"Error": "CSV file not found"}, status=status.HTTP_404_NOT_FOUND)
+
         except (FileNotFoundError,ImportError) as e:
             obj = json.loads(str(e))
             print(type(e))
@@ -84,12 +87,20 @@ def getPredictionFree(request):
     print(query_params)
 
     if request.method == 'GET':
-        fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
-        needPrediction = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
-        months = int(query_params.get('monthsCount')) if query_params.get('monthsCount') else 1
+        try:
+            fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
+            needPrediction = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
+            months = int(query_params.get('monthsCount')) if query_params.get('monthsCount') else 1
 
-        res = getPredict2.getPredict(fileURL,needPrediction,months)
-        return Response(res)
+            res = getPredict2.getPredict(fileURL,needPrediction,months)
+            return Response(res)
+
+        except FileNotFoundError as e:
+            return Response({"Error": "CSV file not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e: 
+            print(e)
+            return Response({"Error": "something wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # 1 by 1 users
 @api_view(['GET'])
@@ -100,21 +111,26 @@ def getMonthlyPrediction(request):
     print(query_params)
 
     if request.method == 'GET':
-        fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
-        needPredictionList = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
-        months = int(query_params.get('monthsCount')) if query_params.get('monthsCount') else 1
+        try:
+            fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
+            needPredictionList = query_params.get('needPrediction') if query_params.get('needPrediction') else ''
+            months = int(query_params.get('monthsCount')) if query_params.get('monthsCount') else 1
 
-        needPrediction = json.loads(needPredictionList)
+            needPrediction = json.loads(needPredictionList)
 
-        outputs = []
+            outputs = []
 
-        for item in needPrediction:
-            res = getPredict2.getPredict(fileURL,item,months)
-            res = res[0] 
-            outputs.append({ 'product': item, 'prediction': res})
+            for item in needPrediction:
+                res = getPredict2.getPredict(fileURL,item,months)
+                res = res[0] 
+                outputs.append({ 'product': item, 'prediction': res})
 
-        print('final outpust : ',outputs)
-        return Response(outputs)
+            print('final outpust : ',outputs)
+            return Response(outputs)
+
+        except Exception as e:
+            print(e)
+            return Response({"Error": "something wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # if request.method == 'GET':
     #     fileURL = query_params.get('fileURL') if query_params.get('fileURL') else ''
